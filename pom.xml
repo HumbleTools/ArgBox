@@ -5,7 +5,7 @@
 	<artifactId>ArgBox</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>ArgBox</name>
-	<description>Description goes here !</description>
+	<description>A small tool designed to handle program arguments. Nothing new, just coding for the fun of it and learning JAVA8.</description>
 	<dependencies>
 		<dependency>
 			<groupId>org.apache.commons</groupId>
