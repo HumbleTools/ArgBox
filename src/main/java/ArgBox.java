@@ -63,15 +63,15 @@ public class ArgBox {
 				final String arg = it.next();
 				final Argument argument = resolveArgument(arg);
 				if (null != argument) {
+					final String longCall = argument.getLongCall();
 					if (!argument.isValueNotRequired() && it.hasNext()) {
-						parsedArguments.put(argument.longCall, it.next());
+						parsedArguments.put(longCall, it.next());
 					} else {
-						parsedArguments.put(argument.longCall, null);
+						parsedArguments.put(longCall, null);
 					}
 				} else {
 					leftovers.add(arg);
 				}
-
 			}
 		}
 		checkMandatoryArguments();
@@ -101,15 +101,15 @@ public class ArgBox {
 	 * Checks if every mandatory argument is present on the command line.
 	 */
 	private void checkMandatoryArguments() {
-		registeredArguments.stream().filter(argument -> argument.mandatory).forEach(arg -> {
-			shoutIfNotTrue(() -> parsedArguments.containsKey(arg.longCall),
-					String.format("The argument %1s is required !", arg.longCall));
+		registeredArguments.stream().filter(argument -> argument.isMandatory()).forEach(arg -> {
+			shoutIfNotTrue(() -> parsedArguments.containsKey(arg.getLongCall()),
+					String.format("The argument %1s is required !", arg.getLongCall()));
 		});
 	}
 
 	private Argument resolveArgument(final String argString) {
 		return registeredArguments.stream()
-				.filter(arg -> arg.shortCall.equals(argString) || arg.longCall.equals(argString))
+				.filter(arg -> arg.getShortCall().equals(argString) || arg.getLongCall().equals(argString))
 				.findFirst()
 				.get();
 	}
@@ -129,11 +129,11 @@ public class ArgBox {
 				"At least one of these parameters is null or empty : argName, shortCall, longCall, helpLine.");
 		shoutIfNotTrue(() -> shortCall.startsWith("-"), String.format(MUST_START_WITH_MSG, argName, "shortCall", "-"));
 		shoutIfNotTrue(() -> longCall.startsWith("--"), String.format(MUST_START_WITH_MSG, argName, "longCall", "--"));
-		shoutIfExists(registeredArguments, arg -> arg.argName.equals(argName),
+		shoutIfExists(registeredArguments, arg -> arg.getArgName().equals(argName),
 				String.format("An argument named %1s has already been registered !", argName));
-		shoutIfExists(registeredArguments, arg -> arg.shortCall.equals(shortCall),
+		shoutIfExists(registeredArguments, arg -> arg.getShortCall().equals(shortCall),
 				String.format("An argument using the shortCall %1s has already been registered !", shortCall));
-		shoutIfExists(registeredArguments, arg -> arg.longCall.equals(longCall),
+		shoutIfExists(registeredArguments, arg -> arg.getLongCall().equals(longCall),
 				String.format("An argument using the longCall %1s has already been registered !", longCall));
 		registeredArguments.add(new Argument(argName, shortCall, longCall, helpLine, mandatory, valueNotRequired));
 	}
@@ -161,86 +161,6 @@ public class ArgBox {
 	 */
 	private boolean isAnyBlank(final String... strings) {
 		return Arrays.asList(strings).stream().anyMatch(str -> (null == str) || str.trim().isEmpty());
-	}
-
-	public class Argument {
-
-		private final String argName;
-
-		private final String shortCall;
-
-		private final String longCall;
-
-		private final String helpLine;
-
-		private final boolean mandatory;
-
-		private final boolean valueNotRequired;
-
-		public Argument(final String argName, final String shortCall, final String longCall, final String helpLine,
-				final boolean mandatory, final boolean valueNotRequired) {
-			this.argName = argName;
-			this.shortCall = shortCall;
-			this.longCall = longCall;
-			this.helpLine = helpLine;
-			this.valueNotRequired = valueNotRequired;
-			this.mandatory = mandatory;
-		}
-
-		public String getArgName() {
-			return argName;
-		}
-
-		public String getShortCall() {
-			return shortCall;
-		}
-
-		public String getLongCall() {
-			return longCall;
-		}
-
-		public String getHelpLine() {
-			return helpLine;
-		}
-
-		public boolean isMandatory() {
-			return mandatory;
-		}
-
-		public boolean isValueNotRequired() {
-			return valueNotRequired;
-		}
-
-		@Override
-		public int hashCode() {
-			final int prime = 31;
-			int result = 1;
-			result = (prime * result) + ((argName == null) ? 0 : argName.hashCode());
-			return result;
-		}
-
-		@Override
-		public boolean equals(final Object obj) {
-			if (this == obj) {
-				return true;
-			}
-			if (obj == null) {
-				return false;
-			}
-			if (!(obj instanceof Argument)) {
-				return false;
-			}
-			final Argument other = (Argument) obj;
-			if (argName == null) {
-				if (other.argName != null) {
-					return false;
-				}
-			} else if (!argName.equals(other.argName)) {
-				return false;
-			}
-			return true;
-		}
-
 	}
 
 }
