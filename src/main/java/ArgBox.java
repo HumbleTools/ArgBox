@@ -20,6 +20,9 @@ import org.apache.commons.lang3.StringUtils;
  */
 public class ArgBox {
 
+	/**
+	 * Predicate used to always validate an argument, by default.
+	 */
 	private static final Predicate<String> DEFAULT_VALIDATOR = value -> true;
 
 	private static final String MUST_START_WITH_MSG = "[%1s] %2s must start with '%3s' !";
@@ -32,7 +35,7 @@ public class ArgBox {
 
 	/**
 	 * Set containing all the arguments created by the working program with the
-	 * register methods.
+	 * register methods, before parsing the command line.
 	 */
 	private final Set<Argument> registeredArguments = new TreeSet<>();
 
@@ -42,6 +45,9 @@ public class ArgBox {
 	 */
 	private final List<String> leftovers = new ArrayList<>();
 
+	/**
+	 * Default constructor, provides the program with an automatic help argument.
+	 */
 	public ArgBox() {
 		this.register("HELP", "-hlp", "--help",
 				"If present on the command line, the program will print out the help manual and exit.");
@@ -63,8 +69,10 @@ public class ArgBox {
 				null == validator ? DEFAULT_VALIDATOR : validator));
 	}
 
-	// TODO review overload needs
-	// TODO JUNITSSSS
+	public void register(final String argName, final String shortCall, final String longCall, final String helpLine,
+			final Boolean mandatory, final boolean valueNotRequired) {
+		register(argName, shortCall, longCall, helpLine, mandatory, valueNotRequired, DEFAULT_VALIDATOR);
+	}
 
 	public void register(final String argName, final String shortCall, final String longCall, final String helpLine,
 			final Boolean mandatory) {
@@ -77,6 +85,7 @@ public class ArgBox {
 
 	public void resolveCommandLine(final boolean forbidLeftovers, final String... args) {
 		if ((args != null) && (args.length > 0)) {
+			// TODO check presence of --help argument and print help immediately.
 			final Iterator<String> it = Arrays.asList(args).iterator();
 			while (it.hasNext()) {
 				final String arg = it.next();
