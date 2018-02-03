@@ -53,6 +53,16 @@ public class ArgBox {
 				"If present on the command line, the program will print out the help manual and exit.");
 	}
 
+	/**
+	 * Register an argument for the running program.
+	 * @param argName The name for this argument.
+	 * @param shortCall The short version of this argument on the command line.
+	 * @param longCall The long version of this argument on the command line.
+	 * @param helpLine The help line to display if the user calls for help.
+	 * @param mandatory True is this argument is mandatory on the command line.
+	 * @param valueNotRequired True if this argument does not need any value, like a flag, on the command line.
+	 * @param validator A Predicate<String> providing some logical validation rule that needs to be true for this argument's value to be a valid one.
+	 */
 	public void register(final String argName, final String shortCall, final String longCall, final String helpLine,
 			final boolean mandatory, final boolean valueNotRequired, final Predicate<String> validator) {
 		shoutIfNotTrue(() -> !StringUtils.isAnyBlank(argName, shortCall, longCall, helpLine),
