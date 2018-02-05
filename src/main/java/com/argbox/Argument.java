@@ -1,9 +1,12 @@
+package com.argbox;
+
 import java.util.function.Predicate;
 
+import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-public class Argument {
+public class Argument implements Comparable<Argument> {
 
 	private final String argName;
 
@@ -92,6 +95,11 @@ public class Argument {
 				.append(valueNotRequired, other.valueNotRequired)
 				.append(validator, other.validator)
 				.isEquals();
+	}
+
+	@Override
+	public int compareTo(final Argument other) {
+		return new CompareToBuilder().append(longCall, other.longCall).toComparison();
 	}
 
 }

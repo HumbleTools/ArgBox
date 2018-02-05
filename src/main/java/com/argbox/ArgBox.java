@@ -1,3 +1,5 @@
+package com.argbox;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -19,6 +21,10 @@ import org.apache.commons.lang3.StringUtils;
  * management.
  */
 public class ArgBox {
+
+	// TODO collect errors instead of throwing right away each error. Build a
+	// collection filled by only one method which will decide when shouting is
+	// necessary. Then after parsing when there are errors, shout.
 
 	/**
 	 * Predicate used to always validate an argument, by default.
@@ -46,22 +52,34 @@ public class ArgBox {
 	private final List<String> leftovers = new ArrayList<>();
 
 	/**
-	 * Default constructor, provides the program with an automatic help argument.
+	 * Default constructor, provides the program with an automatic help
+	 * argument.
 	 */
 	public ArgBox() {
 		this.register("HELP", "-hlp", "--help",
-				"If present on the command line, the program will print out the help manual and exit.");
+				"If present on the command line, the program will print out the help manual and exit. #helpception");
 	}
 
 	/**
 	 * Register an argument for the running program.
-	 * @param argName The name for this argument.
-	 * @param shortCall The short version of this argument on the command line.
-	 * @param longCall The long version of this argument on the command line.
-	 * @param helpLine The help line to display if the user calls for help.
-	 * @param mandatory True is this argument is mandatory on the command line.
-	 * @param valueNotRequired True if this argument does not need any value, like a flag, on the command line.
-	 * @param validator A Predicate<String> providing some logical validation rule that needs to be true for this argument's value to be a valid one.
+	 *
+	 * @param argName
+	 *            The name for this argument.
+	 * @param shortCall
+	 *            The short version of this argument on the command line.
+	 * @param longCall
+	 *            The long version of this argument on the command line.
+	 * @param helpLine
+	 *            The help line to display if the user calls for help.
+	 * @param mandatory
+	 *            True is this argument is mandatory on the command line.
+	 * @param valueNotRequired
+	 *            True if this argument does not need any value, like a flag, on
+	 *            the command line.
+	 * @param validator
+	 *            A Predicate<String> providing some logical validation rule
+	 *            that needs to be true for this argument's value to be a valid
+	 *            one.
 	 */
 	public void register(final String argName, final String shortCall, final String longCall, final String helpLine,
 			final boolean mandatory, final boolean valueNotRequired, final Predicate<String> validator) {
@@ -95,7 +113,8 @@ public class ArgBox {
 
 	public void resolveCommandLine(final boolean forbidLeftovers, final String... args) {
 		if ((args != null) && (args.length > 0)) {
-			// TODO check presence of --help argument and print help immediately.
+			// TODO check presence of --help argument and print help
+			// immediately.
 			final Iterator<String> it = Arrays.asList(args).iterator();
 			while (it.hasNext()) {
 				final String arg = it.next();
@@ -126,15 +145,19 @@ public class ArgBox {
 	 * where it wishes.
 	 */
 	public String getHelp() {
-		final StringBuilder helpBuilder = new StringBuilder("HELP\n\n");
+		final StringBuilder helpBuilder = new StringBuilder("HELP MANUAL\n\n");
 		for (final Argument arg : registeredArguments) {
-			helpBuilder.append(String.format("%1s$20s%2s/%3s$10s ", arg.getArgName(), arg.getShortCall(), arg
+			helpBuilder.append(String.format("- %1s : %2s | %3s\n", arg.getArgName(), arg.getShortCall(), arg
 					.getLongCall()));
-			helpBuilder.append("This argument is mandatory ");
-			helpBuilder.append(String.format("and must %1s be followed by a value.\n", arg.isValueNotRequired() ? "NOT"
-					: ""));
 			helpBuilder.append(arg.getHelpLine());
-			helpBuilder.append("\n\n");
+			helpBuilder.append("\n");
+			if (arg.isMandatory()) {
+				helpBuilder.append("This argument is mandatory on the command line.\n");
+			}
+			if (arg.isValueNotRequired()) {
+				helpBuilder.append("This argument has no value. If a value is present, it will be ignored.\n");
+			}
+			helpBuilder.append("\n");
 		}
 		return helpBuilder.toString();
 	}
@@ -153,6 +176,11 @@ public class ArgBox {
 		parsedArguments.forEach((key, value) -> {
 			final Argument argument = resolveArgument(key);
 			if ((null != argument) && (null != argument.getValidator())) {
+				if (!argument.isValueNotRequired() && (null == value)) {
+					throwIllegalArgumentException(String.format(
+							"The argument %1s requires a value but has an empty one : %2s", key,
+							value));
+				}
 				shoutIfNotTrue(() -> argument.getValidator().test(value),
 						String.format("The argument %1s has an incorrect value : %2s", argument.getLongCall(), value));
 			}
