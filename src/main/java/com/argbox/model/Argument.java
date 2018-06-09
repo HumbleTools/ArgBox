@@ -1,4 +1,4 @@
-package com.argbox;
+package com.argbox.model;
 
 import java.util.function.Predicate;
 
@@ -59,6 +59,10 @@ public class Argument implements Comparable<Argument> {
 
 	public boolean isValueNotRequired() {
 		return valueNotRequired;
+	}
+
+	public boolean isValueRequired() {
+		return !valueNotRequired;
 	}
 
 	@Override
