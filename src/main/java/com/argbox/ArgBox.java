@@ -4,10 +4,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
 import java.util.function.BooleanSupplier;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -53,7 +53,7 @@ public class ArgBox {
 	 * Set containing all the arguments created by the working program with the
 	 * register methods, before parsing the command line.
 	 */
-	private final Set<Argument> registeredArguments = new TreeSet<>();
+	private final Set<Argument> registeredArguments = new LinkedHashSet<>();
 
 	/**
 	 * List of String arguments on the command line that were not consumed by the
@@ -236,6 +236,8 @@ public class ArgBox {
 			helpBuilder.append("\n");
 			if (arg.isMandatory()) {
 				helpBuilder.append("This argument is mandatory on the command line.\n");
+			} else {
+				helpBuilder.append("This argument is not mandatory on the command line.\n");
 			}
 			if (arg.isValueNotRequired()) {
 				helpBuilder.append("This argument has no value. If a value is present, it will be ignored.\n");

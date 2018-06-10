@@ -3,6 +3,9 @@
  */
 package com.argbox.model;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 /**
  * @author Lewis
  *
@@ -48,6 +51,34 @@ public class ParsedArgument extends Argument {
 	 */
 	public void setValue(final String value) {
 		this.value = value;
+	}
+
+	@Override
+	public int hashCode() {
+		return new HashCodeBuilder(9, 5)
+				.appendSuper(super.hashCode())
+				.append(value)
+				.append(commandArg)
+				.toHashCode();
+	}
+
+	@Override
+	public boolean equals(final Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (!(obj instanceof ParsedArgument)) {
+			return false;
+		}
+		final ParsedArgument other = (ParsedArgument) obj;
+		return new EqualsBuilder()
+				.appendSuper(super.equals(other))
+				.append(value, other.value)
+				.append(commandArg, other.commandArg)
+				.isEquals();
 	}
 
 }
